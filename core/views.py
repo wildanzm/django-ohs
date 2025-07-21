@@ -11,6 +11,48 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import EmployeeForm
+from django.contrib.messages.views import SuccessMessageMixin
+
+class EmployeeListView(LoginRequiredMixin, ListView):
+    model = Employee
+    template_name = 'core/employee.html'
+    context_object_name = 'employees'
+    paginate_by = 10 
+
+class EmployeeCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Employee
+    form_class = EmployeeForm
+    template_name = 'core/employee_form.html'
+    success_url = reverse_lazy('employee_list') 
+    success_message = "Data karyawan berhasil ditambahkan."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Tambah Karyawan Baru'
+        return context
+
+class EmployeeUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Employee
+    form_class = EmployeeForm
+    template_name = 'core/employee_form.html'
+    success_url = reverse_lazy('employee_list')
+    success_message = "Data karyawan berhasil diperbarui." 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Edit Data Karyawan'
+        return context
+
+class EmployeeDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = Employee
+    template_name = 'core/employee_confirm_delete.html'
+    success_url = reverse_lazy('employee_list')
+    success_message = "Data karyawan berhasil dihapus."
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -101,10 +143,6 @@ def dashboard_view(request):
         'active_filter': active_filter,
     }
     return render(request, 'core/dashboard.html', context)
-
-@login_required
-def employee_view(request):
-    return render(request, 'core/employee.html')
 
 @login_required
 def attendance_view(request):

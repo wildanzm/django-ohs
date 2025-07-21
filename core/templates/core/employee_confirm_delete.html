@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Konfirmasi Hapus{% endblock %}
+{% block page_title %}Hapus Karyawan{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center bg-white/70 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/30">
+    <svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+    </svg>
+    <h3 class="mb-5 text-lg font-normal text-gray-500">Anda yakin ingin menghapus data karyawan berikut?</h3>
+    <p class="text-xl font-bold text-gray-800 mb-6">"{{ object.full_name }}"</p>
+    
+    <form method="post" class="inline-block">
+        {% csrf_token %}
+        
+        <div class="flex flex-col-reverse sm:flex-row sm:justify-center gap-4">
+            <a href="{% url 'employee_list' %}" class="w-full sm:w-auto py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 text-center">
+                Tidak, batalkan
+            </a>
+            <button type="submit" class="w-full sm:w-auto text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center justify-center">
+                Ya, saya yakin
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
