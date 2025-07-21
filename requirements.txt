@@ -1,0 +1,13 @@
+# Core Django Framework
+django==5.2.3
+django-environ==0.11.2
+
+# Database Driver
+mysqlclient==2.2.4
+
+# Machine Learning & Image Processing
+ultralytics==8.1.27
+torch==2.2.1
+torchvision==0.17.1
+numpy==1.26.4
+opencv-python-headless==4.9.0.80
