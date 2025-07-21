@@ -2,7 +2,6 @@
 
 from django.db import migrations
 
-# Daftar APD yang ingin kita masukkan
 INITIAL_PPES = [
     'Hardhat',
     'Mask',
@@ -10,18 +9,16 @@ INITIAL_PPES = [
 ]
 
 def create_initial_ppes(apps, schema_editor):
-    # Kita ambil model 'PPE' dari versi historis aplikasi
     PPE = apps.get_model('core', 'PPE')
     for ppe_name in INITIAL_PPES:
-        # Buat objek jika belum ada
         PPE.objects.get_or_create(name=ppe_name)
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0001_initial'), # Tergantung pada migrasi pertama yang membuat model
+        ('core', '0001_initial'), 
     ]
 
     operations = [
-        migrations.RunPython(create_initial_ppes), # Jalankan fungsi kita
+        migrations.RunPython(create_initial_ppes), 
     ]

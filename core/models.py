@@ -20,12 +20,20 @@ class PPE(models.Model):
         return self.name
 
 class Attendance(models.Model):
+    class AttendanceStatus(models.TextChoices):
+        HADIR = 'Hadir', 'Hadir'
+        IZIN = 'Izin', 'Izin'
+        SAKIT = 'Sakit', 'Sakit'
+        TANPA_KETERANGAN = 'Tanpa Keterangan', 'Tanpa Keterangan'
+    
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
     check_in_time = models.DateTimeField(auto_now_add=True)
     body_temperature = models.DecimalField(max_digits=4, decimal_places=2, help_text="Temperature in Celsius")
-    image_attendance = models.CharField(max_length=255, help_text="Path to the photo taken during check-in")
+    status = models.CharField(max_length=20, choices=AttendanceStatus.choices, default=AttendanceStatus.TANPA_KETERANGAN, help_text="Status of attendance")
+    image_attendance = models.ImageField(upload_to='attendance_image/', help_text="Path to the photo taken during check-in")
     detected_ppes = models.ManyToManyField(PPE, through='PPEDetection')
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Attendance for {self.employee.full_name} at {self.check_in_time.strftime('%Y-%m-%d %H:%M')}"

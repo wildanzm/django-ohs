@@ -39,18 +39,19 @@ class Migration(migrations.Migration):
                 ('check_in_time', models.DateTimeField(auto_now_add=True)),
                 ('body_temperature', models.DecimalField(decimal_places=2, help_text='Temperature in Celsius', max_digits=4)),
                 ('image_attendance', models.CharField(help_text='Path to the photo taken during check-in', max_length=255)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('employee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attendances', to='core.employee')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
             name='PPEDetection',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
                 ('attendance', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.attendance')),
                 ('ppe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.ppe')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
             ],
             options={
                 'unique_together': {('attendance', 'ppe')},

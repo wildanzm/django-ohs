@@ -1,0 +1,105 @@
+{% extends "base.html" %} {% block title %}Dashboard{% endblock %} {% block page_title %}Dashboard{% endblock %} {% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+	<div class="bg-white/70 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/30">
+		<h5 class="mb-2 text-xl font-bold tracking-tight text-gray-800">Total Karyawan</h5>
+		<p class="font-bold text-4xl text-orange-900">{{ total_employees }}</p>
+	</div>
+	<div class="bg-white/70 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/30">
+		<h5 class="mb-2 text-xl font-bold tracking-tight text-gray-800">Hadir Hari Ini</h5>
+		<p class="font-bold text-4xl text-green-600">{{ present_today }}</p>
+	</div>
+	<div class="bg-white/70 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/30">
+		<h5 class="mb-2 text-xl font-bold tracking-tight text-gray-800">Tidak Hadir Hari Ini</h5>
+		<p class="font-bold text-4xl text-red-600">{{ absent_today }}</p>
+	</div>
+</div>
+
+<div class="bg-white/70 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/30">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+        <h5 class="text-xl font-bold text-gray-800 mb-2 md:mb-0">Statistik Kehadiran</h5>
+
+        <div>
+            <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" type="button">
+                {% if active_filter == 'monthly' %}
+                    Bulanan
+                {% elif active_filter == 'yearly' %}
+                    Tahunan
+                {% else %}
+                    Mingguan
+                {% endif %}
+                <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                </svg>
+            </button>
+            <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+                <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
+                    <li>
+                        <a href="?filter=weekly" class="block px-4 py-2 hover:bg-gray-100">Mingguan</a>
+                    </li>
+                    <li>
+                        <a href="?filter=monthly" class="block px-4 py-2 hover:bg-gray-100">Bulanan</a>
+                    </li>
+                    <li>
+                        <a href="?filter=yearly" class="block px-4 py-2 hover:bg-gray-100">Tahunan</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        </div>
+    <div>
+        <canvas id="attendanceChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+	    const ctx = document.getElementById('attendanceChart');
+
+	    new Chart(ctx, {
+	        type: 'line',
+	        data: {
+	            labels: {{ chart_labels|safe }},
+	            datasets: [
+	                {
+	                    label: 'Hadir',
+	                    data: {{ hadir_data|safe }},
+	                    borderColor: 'rgb(34, 197, 94)', // Green
+	                    tension: 0.1
+	                },
+	                {
+	                    label: 'Sakit',
+	                    data: {{ sakit_data|safe }},
+	                    borderColor: 'rgb(234, 179, 8)', // Yellow
+	                    tension: 0.1
+	                },
+	                {
+	                    label: 'Izin',
+	                    data: {{ izin_data|safe }},
+	                    borderColor: 'rgb(59, 130, 246)', // Blue
+	                    tension: 0.1
+	                },
+	                {
+	                    label: 'Tanpa Keterangan',
+	                    data: {{ tanpa_keterangan_data|safe }},
+	                    borderColor: 'rgb(107, 114, 128)', // Gray
+	                    tension: 0.1
+	                }
+	            ]
+	        },
+	        options: {
+	            responsive: true,
+	            scales: {
+	                y: {
+	                    beginAtZero: true,
+	                    ticks: {
+	                        stepSize: 1 // Memastikan sumbu Y hanya menampilkan bilangan bulat
+	                    }
+	                }
+	            }
+	        }
+	    });
+	});
+</script>
+{% endblock %}
