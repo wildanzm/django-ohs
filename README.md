@@ -85,5 +85,3 @@ Follow these steps to get the project running locally.
 
 -   **Admin Panel:** Access the admin interface at `http://127.0.0.1:8000/admin/` to manage all application data.
 -   **Main Dashboard:** Visit `http://127.0.0.1:8000/` to see the main application dashboard.
-
-<details>
