@@ -24,13 +24,13 @@ class Attendance(models.Model):
         HADIR = 'Hadir', 'Hadir'
         IZIN = 'Izin', 'Izin'
         SAKIT = 'Sakit', 'Sakit'
-        TANPA_KETERANGAN = 'Tanpa Keterangan', 'Tanpa Keterangan'
+        TANPA_KETERANGAN = 'Alfa', 'Alfa'
     
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
     check_in_time = models.DateTimeField(auto_now_add=True)
-    body_temperature = models.DecimalField(max_digits=4, decimal_places=2, help_text="Temperature in Celsius")
+    body_temperature = models.DecimalField(max_digits=4, decimal_places=2, null=True, help_text="Temperature in Celsius")
     status = models.CharField(max_length=20, choices=AttendanceStatus.choices, default=AttendanceStatus.TANPA_KETERANGAN, help_text="Status of attendance")
-    image_attendance = models.ImageField(upload_to='attendance_image/', help_text="Path to the photo taken during check-in")
+    image_attendance = models.ImageField(upload_to='attendance_image/', null=True, blank=True, help_text="Path to the photo taken during check-in")
     detected_ppes = models.ManyToManyField(PPE, through='PPEDetection')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

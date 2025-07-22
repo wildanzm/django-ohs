@@ -65,25 +65,25 @@
 	                {
 	                    label: 'Hadir',
 	                    data: {{ hadir_data|safe }},
-	                    borderColor: 'rgb(34, 197, 94)', // Green
+	                    borderColor: 'rgb(34, 197, 94)',
 	                    tension: 0.1
 	                },
 	                {
 	                    label: 'Sakit',
 	                    data: {{ sakit_data|safe }},
-	                    borderColor: 'rgb(234, 179, 8)', // Yellow
+	                    borderColor: 'rgb(234, 179, 8)',
 	                    tension: 0.1
 	                },
 	                {
 	                    label: 'Izin',
 	                    data: {{ izin_data|safe }},
-	                    borderColor: 'rgb(59, 130, 246)', // Blue
+	                    borderColor: 'rgb(59, 130, 246)', 
 	                    tension: 0.1
 	                },
 	                {
-	                    label: 'Tanpa Keterangan',
+	                    label: 'Alfa',
 	                    data: {{ tanpa_keterangan_data|safe }},
-	                    borderColor: 'rgb(107, 114, 128)', // Gray
+	                    borderColor: 'rgb(239, 68, 68)', 
 	                    tension: 0.1
 	                }
 	            ]
@@ -94,7 +94,7 @@
 	                y: {
 	                    beginAtZero: true,
 	                    ticks: {
-	                        stepSize: 1 // Memastikan sumbu Y hanya menampilkan bilangan bulat
+	                        stepSize: 1
 	                    }
 	                }
 	            }

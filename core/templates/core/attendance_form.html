@@ -1,0 +1,167 @@
+{% extends "base.html" %} {% block title %}{{ page_title }}{% endblock %} {% block page_title %}{{ page_title }}{% endblock %} {% block content %}
+<div class="max-w-2xl mx-auto bg-white/70 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/30">
+	<form method="post" enctype="multipart/form-data" id="attendance-form">
+		{% csrf_token %}
+		<div class="space-y-6">
+			<div>
+				<label for="{{ form.status.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ form.status.label }}</label>
+				{{ form.status }}
+			</div>
+
+			<div id="image-container" class="hidden">
+				<label class="block mb-2 text-sm font-medium text-gray-900">Foto Bukti</label>
+				<div class="flex items-center justify-center w-full gap-4 mb-4">
+					<button type="button" id="upload-btn" class="w-full text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Upload File</button>
+					<button type="button" id="camera-btn" class="w-full text-green-700 hover:text-white border border-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Buka Kamera</button>
+				</div>
+
+				{{ form.image_attendance }}
+
+				<div id="camera-view" class="hidden w-full bg-gray-200 rounded-lg">
+					<select id="camera-select" class="bg-gray-50 border-b border-gray-300 text-gray-900 text-sm rounded-t-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></select>
+					<video id="video" class="w-full h-auto" autoplay playsinline></video>
+				</div>
+
+				<img id="image-preview" src="#" alt="Preview Gambar" class="hidden w-full h-auto mt-2 rounded-lg" />
+				<button type="button" id="capture-btn" class="hidden mt-4 w-full text-white bg-orange-500 hover:bg-orange-600 font-medium rounded-lg text-sm px-5 py-2.5">Ambil Gambar</button>
+			</div>
+		</div>
+
+		<div class="mt-8 flex justify-end gap-4">
+			<a href="{{ request.META.HTTP_REFERER|default_if_none:request.session.selected_date }}" class="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Batal</a>
+			<button type="submit" class="text-white bg-orange-500 hover:bg-orange-600 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Simpan Kehadiran</button>
+		</div>
+	</form>
+</div>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const statusSelect = document.getElementById("{{ form.status.id_for_label }}");
+		const imageContainer = document.getElementById("image-container");
+		const fileInput = document.getElementById("{{ form.image_attendance.id_for_label }}");
+
+		const uploadBtn = document.getElementById("upload-btn");
+		const cameraBtn = document.getElementById("camera-btn");
+		const captureBtn = document.getElementById("capture-btn");
+
+		const cameraView = document.getElementById("camera-view");
+		const imagePreview = document.getElementById("image-preview");
+		const video = document.getElementById("video");
+		const canvas = document.createElement("canvas");
+		const cameraSelect = document.getElementById("camera-select");
+		let currentStream;
+
+		function stopMediaTracks(stream) {
+			if (stream) {
+				stream.getTracks().forEach((track) => track.stop());
+			}
+		}
+
+		async function startCamera(deviceId) {
+			stopMediaTracks(currentStream);
+			const constraints = {
+				video: {
+					deviceId: deviceId ? { exact: deviceId } : undefined,
+				},
+			};
+			try {
+				currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+				video.srcObject = currentStream;
+				cameraView.classList.remove("hidden");
+				captureBtn.classList.remove("hidden");
+			} catch (e) {
+				console.error(e);
+				alert("Gagal mengakses kamera. Pastikan Anda memberikan izin.");
+			}
+		}
+
+		async function getCameras() {
+			cameraSelect.innerHTML = "";
+			try {
+				const devices = await navigator.mediaDevices.enumerateDevices();
+				const videoDevices = devices.filter((device) => device.kind === "videoinput");
+
+				videoDevices.forEach((device, index) => {
+					const option = document.createElement("option");
+					option.value = device.deviceId;
+					let label = device.label || `Kamera ${index + 1}`;
+					if (label.toLowerCase().includes("front")) {
+						label = "Kamera Depan";
+					} else if (label.toLowerCase().includes("back")) {
+						label = "Kamera Belakang";
+					}
+					option.innerText = label;
+					cameraSelect.appendChild(option);
+				});
+				if (videoDevices.length > 0) {
+					startCamera(videoDevices[0].deviceId);
+				}
+			} catch (e) {
+				console.error("Gagal mendapatkan daftar kamera:", e);
+			}
+		}
+
+		cameraBtn.addEventListener("click", () => {
+			imagePreview.classList.add("hidden");
+			fileInput.value = "";
+			getCameras();
+		});
+
+		cameraSelect.addEventListener("change", () => {
+			startCamera(cameraSelect.value);
+		});
+
+		uploadBtn.addEventListener("click", () => {
+			stopMediaTracks(currentStream);
+			cameraView.classList.add("hidden");
+			captureBtn.classList.add("hidden");
+			fileInput.click();
+		});
+
+		fileInput.addEventListener("change", (event) => {
+			const file = event.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					imagePreview.src = e.target.result;
+					imagePreview.classList.remove("hidden");
+				};
+				reader.readAsDataURL(file);
+			}
+		});
+
+		captureBtn.addEventListener("click", () => {
+			const context = canvas.getContext("2d");
+			canvas.width = video.videoWidth;
+			canvas.height = video.videoHeight;
+			context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+			imagePreview.src = canvas.toDataURL("image/jpeg");
+			imagePreview.classList.remove("hidden");
+
+			stopMediaTracks(currentStream);
+			cameraView.classList.add("hidden");
+			captureBtn.classList.add("hidden");
+
+			canvas.toBlob((blob) => {
+				const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
+				const dataTransfer = new DataTransfer();
+				dataTransfer.items.add(file);
+				fileInput.files = dataTransfer.files;
+			}, "image/jpeg");
+		});
+
+		function toggleImageField() {
+			if (statusSelect.value === "Hadir") {
+				imageContainer.classList.remove("hidden");
+			} else {
+				imageContainer.classList.add("hidden");
+				stopMediaTracks(currentStream);
+			}
+		}
+
+		toggleImageField();
+		statusSelect.addEventListener("change", toggleImageField);
+	});
+</script>
+{% endblock %}

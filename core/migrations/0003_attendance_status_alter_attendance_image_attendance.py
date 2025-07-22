@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attendance',
             name='status',
-            field=models.CharField(choices=[('Hadir', 'Hadir'), ('Izin', 'Izin'), ('Sakit', 'Sakit'), ('Tanpa Keterangan', 'Tanpa Keterangan')], default='Tanpa Keterangan', help_text='Status of attendance', max_length=20),
+            field=models.CharField(choices=[('Hadir', 'Hadir'), ('Izin', 'Izin'), ('Sakit', 'Sakit'), ('Alfa', 'Alfa')], default='Alfa', help_text='Status of attendance', max_length=20),
         ),
         migrations.AlterField(
             model_name='attendance',
